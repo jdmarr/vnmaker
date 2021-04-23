@@ -16,7 +16,6 @@ User.createUser = function (newUser, result) {
                 }
                 else{
                   console.log("createUser result: ", res);
-                    //console.log(res.insertId);
                     result(null, res.insertId);
                 }
             });
@@ -66,13 +65,13 @@ User.findOrCreateByGoogleId = function (user, result) {
               result(null, existingUser);
             }
             else{
-              const newUser = user;
+              var newUser = user;
               User.createUser(newUser, function(err, insertId){
                 if(err) {
-                    console.log("findOrCreateByGoogleId: createUser error: ", err);
                     result(err, null);
                 }
                 else{
+                    newUser.userId = insertId;
                     result(null, newUser);
                 }
               });
