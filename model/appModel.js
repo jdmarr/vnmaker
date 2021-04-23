@@ -15,7 +15,7 @@ User.createUser = function (newUser, result) {
                     result(err, null);
                 }
                 else{
-                  console.log("createUser result: ", res);
+                  console.log("created new user with userId = ", res.insertId);
                     result(null, res.insertId);
                 }
             });
@@ -28,34 +28,43 @@ User.getUserById = function (user, result) {
                 }
                 else{
                   const resJSON = JSON.parse(JSON.stringify(res));
-                  console.log("getUserById result: ", resJSON[0]);
                     result(null, resJSON[0]);
 
                 }
             });
 };
-User.getUserByGoogleId = function (user, result) {
-        sql.query("Select * from Users where googleId = ? ", user.googleId, function (err, res) {
-                if(err) {
-                    console.log("getUserByGoogleId error: ", err);
-                    result(err, null);
-                }
-                else{
-                  const resJSON = JSON.parse(JSON.stringify(res));
-                  if(resJSON.length <= 1){
-                    console.log("getUserByGoogleId result: ", resJSON[0]);
-                    result(null, resJSON[0]);
-                  }
-                  else{
-                    multUserErr = "Found multiple users with same googleId."
-                    console.log("getUserByGoogleId error: ", multUserErr);
-                    result(multUserErr, null);
-                  }
-                }
-            });
+User.getUserByThirdPartyId = function (user, thirdparty, result){
+  var thirdPartyString;
+  var queryId;
+  if(thirdparty == 'google'){
+    thirdPartyString = 'googleId';
+    queryId = user.googleId;
+  }
+  else{
+    thirdPartyString = 'githubId';
+    queryId = user.githubId;
+  }
+  const queryString = "Select * from Users where " + thirdPartyString + " = ? ";
+  sql.query(queryString, queryId, function (err, res) {
+          if(err) {
+              console.log("getUserByThirdPartyId error: ", err);
+              result(err, null);
+          }
+          else{
+            const resJSON = JSON.parse(JSON.stringify(res));
+            if(resJSON.length <= 1){
+              result(null, resJSON[0]);
+            }
+            else{
+              multUserErr = "Found multiple users with same " + thirdPartyString;
+              console.log("getUserByThirdPartyId error: ", multUserErr);
+              result(multUserErr, null);
+            }
+          }
+      });
 };
-User.findOrCreateByGoogleId = function (user, result) {
-        User.getUserByGoogleId(user, function(err, existingUser){
+User.findOrCreateByThirdPartyId = function (user, thirdparty, result) {
+        User.getUserByThirdPartyId(user, thirdparty, function(err, existingUser){
           if(err){
             result(err, null);
           }
@@ -79,51 +88,45 @@ User.findOrCreateByGoogleId = function (user, result) {
           }
         });
 };
-User.getUserByGitHubId = function (user, result) {
-        sql.query("Select * from Users where githubId = ? ", user.githubId, function (err, res) {
-                if(err) {
-                    console.log("getUserByGitHubId error: ", err);
-                    result(err, null);
-                }
-                else{
-                  const resJSON = JSON.parse(JSON.stringify(res));
-                  if(resJSON.length <= 1){
-                    console.log("getUserByGitHubId result: ", resJSON[0]);
-                    result(null, resJSON[0]);
-                  }
-                  else{
-                    multUserErr = "Found multiple users with same githubId."
-                    console.log("getUserByGitHubId error: ", multUserErr);
-                    result(multUserErr, null);
-                  }
-                }
-            });
-};
-User.findOrCreateByGitHubId = function (user, result) {
-        User.getUserByGitHubId(user, function(err, existingUser){
+User.getUserByGoogleId = function (user, result) {
+        User.getUserByThirdPartyId(user, 'google', function(err, res){
           if(err){
             result(err, null);
           }
           else{
-            if(existingUser){
-              // found the user in our db -> return the entry
-              result(null, existingUser);
-            }
-            else{
-              var newUser = user;
-              User.createUser(newUser, function(err, insertId){
-                if(err) {
-                    console.log("findOrCreateByGitHubId: createUser error: ", err);
-                    result(err, null);
-                }
-                else{
-                  newUser.userId = insertId;
-                  result(null, newUser);
-                }
-              });
-            }
+            result(null, res);
           }
         });
+};
+User.findOrCreateByGoogleId = function (user, result) {
+        User.findOrCreateByThirdPartyId(user, 'google', function(err, newOrExistingUser){
+          if(err){
+            result(err, null);
+          }
+          else{
+            result(null, newOrExistingUser);
+          }
+        });
+};
+User.getUserByGitHubId = function (user, result) {
+  User.getUserByThirdPartyId(user, 'github', function(err, res){
+    if(err){
+      result(err, null);
+    }
+    else{
+      result(null, res);
+    }
+  });
+};
+User.findOrCreateByGitHubId = function (user, result) {
+  User.findOrCreateByThirdPartyId(user, 'github', function(err, newOrExistingUser){
+    if(err){
+      result(err, null);
+    }
+    else{
+      result(null, newOrExistingUser);
+    }
+  });
 };
 // Task.getAllTask = function (result) {
 //         sql.query("Select * from tasks", function (err, res) {
