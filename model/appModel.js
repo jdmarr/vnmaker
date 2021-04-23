@@ -79,6 +79,52 @@ User.findOrCreateByGoogleId = function (user, result) {
           }
         });
 };
+User.getUserByGitHubId = function (user, result) {
+        sql.query("Select * from Users where githubId = ? ", user.githubId, function (err, res) {
+                if(err) {
+                    console.log("getUserByGitHubId error: ", err);
+                    result(err, null);
+                }
+                else{
+                  const resJSON = JSON.parse(JSON.stringify(res));
+                  if(resJSON.length <= 1){
+                    console.log("getUserByGitHubId result: ", resJSON[0]);
+                    result(null, resJSON[0]);
+                  }
+                  else{
+                    multUserErr = "Found multiple users with same githubId."
+                    console.log("getUserByGitHubId error: ", multUserErr);
+                    result(multUserErr, null);
+                  }
+                }
+            });
+};
+User.findOrCreateByGitHubId = function (user, result) {
+        User.getUserByGitHubId(user, function(err, existingUser){
+          if(err){
+            result(err, null);
+          }
+          else{
+            if(existingUser){
+              // found the user in our db -> return the entry
+              result(null, existingUser);
+            }
+            else{
+              var newUser = user;
+              User.createUser(newUser, function(err, insertId){
+                if(err) {
+                    console.log("findOrCreateByGitHubId: createUser error: ", err);
+                    result(err, null);
+                }
+                else{
+                  newUser.userId = insertId;
+                  result(null, newUser);
+                }
+              });
+            }
+          }
+        });
+};
 // Task.getAllTask = function (result) {
 //         sql.query("Select * from tasks", function (err, res) {
 //
