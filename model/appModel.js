@@ -167,4 +167,75 @@ User.findOrCreateByGitHubId = function (user, result) {
 //             });
 // };
 
-module.exports= User;
+//Image object constructor
+var Image = function(image){
+    this.imageId = image.imageId;
+    this.userId = image.userId;
+    this.imagePath = image.imagePath;
+    this.title = image.title;
+};
+
+Image.createImage = function (newImage, result) {
+        sql.query("INSERT INTO Images set ?", newImage, function (err, res) {
+
+                if(err) {
+                    console.log("createImage error: ", err);
+                    result(err, null);
+                }
+                else{
+                  console.log("created new image with imageId = ", res.insertId);
+                    result(null, res.insertId);
+                }
+            });
+};
+
+Image.getImagesByUserId = function (userId, result) {
+        sql.query("Select * from Images where userId = ? ", userId, function (err, res) {
+                if(err) {
+                    console.log("getImagesByUserId error: ", err);
+                    result(err, null);
+                }
+                else{
+                  const resJSON = JSON.parse(JSON.stringify(res));
+                    result(null, resJSON);
+                }
+            });
+};
+
+//Panel object constructor
+var Panel = function(panel){
+    this.panelId = panel.panelId;
+    this.userId = panel.userId;
+    this.imageId = panel.imageId;
+    this.text = panel.text;
+    this.prevId = panel.prevId;
+    this.nextId = panel.nextId;
+};
+
+Panel.createPanel = function (newPanel, result) {
+        sql.query("INSERT INTO Panels set ?", newPanel, function (err, res) {
+                if(err) {
+                    console.log("createPanel error: ", err);
+                    result(err, null);
+                }
+                else{
+                  console.log("created new panel with panelId = ", res.insertId);
+                    result(null, res.insertId);
+                }
+            });
+};
+
+Panel.getPanelsByUserId = function (userId, result) {
+        sql.query("Select * from Panels where userId = ? ", userId, function (err, res) {
+                if(err) {
+                    console.log("getPanelsByUserId error: ", err);
+                    result(err, null);
+                }
+                else{
+                  const resJSON = JSON.parse(JSON.stringify(res));
+                    result(null, resJSON);
+                }
+            });
+};
+
+module.exports= {User, Image, Panel};

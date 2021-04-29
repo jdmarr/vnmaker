@@ -3,4 +3,17 @@
 <h1>Login Successful</h1>
 <a class="btn btn-light btn-lg" href="/logout" role="button">Log Out</a>
 
+<a class="btn btn-dark btn-lg" href="/new-panel" role="button">Add Panel Before</a>
+
+<h1>Upload Image</h1>
+
+<form action="/upload" method="post" enctype="multipart/form-data">
+  <input type="file" accept="image/*" name="photo">
+  <div class="form-group">
+    <input type="text" class="form-control" id="imageTitle" name="imageTitle" placeholder="Give your image a title" required>
+  </div>
+  <input type="hidden" id="userId" name="userId" value=<%=userId%>>
+  <input type="submit" value="Upload">
+</form>
+
 <%- include('partials/footer') %>

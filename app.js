@@ -6,8 +6,10 @@ const session = require("express-session");
 const passport = require("passport");
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const GitHubStrategy = require('passport-github2').Strategy;
+const multer = require('multer');
+const upload = multer({dest: __dirname + '/uploads/images'});
 
-const User = require('./model/appModel.js');
+const {User, Image, Panel} = require('./model/appModel.js');
 
 const app = express();
 
@@ -68,7 +70,7 @@ app.get("/", function(req, res) {
 
 app.get("/edit", function(req, res) {
   if (req.isAuthenticated()) {
-    res.render("edit");
+    res.render("edit", {userId: req.session.passport.user});
   } else {
     res.redirect("/");
   }
@@ -103,6 +105,44 @@ app.get('/auth/github/edit',
   function(req, res) {
     // Successful authentication, redirect to edit page.
     res.redirect('/edit');
+});
+
+app.post('/upload', upload.single('photo'), function(req, res) {
+    if(req.file) {
+      // TODO: Check image is valid
+      // TODO: Check title isn't a duplicate
+        Image.createImage({userId: req.body.userId, imagePath: req.file.filename, title: req.body.imageTitle}, function(err, insertId){
+          if(err){
+            console.log(err);
+          }
+          else{
+            res.redirect('/edit');
+          }
+        });
+    }
+    else throw 'error';
+});
+
+app.get("/new-panel", function(req, res){
+  if (req.isAuthenticated()) {
+    Image.getImagesByUserId(req.session.passport.user, function(err, images){
+      res.render("new-panel", {images: images, userId: req.session.passport.user});
+    });
+  } else {
+    res.redirect("/");
+  }
+});
+
+app.post("/new-panel", function(req, res){
+  console.log(req.body);
+  Panel.createPanel({userId:req.body.userId, imageId: req.body.imageId, text: req.body.panelText}, function(err, insertId){
+    if(err){
+      console.log(err);
+    }
+    else{
+      res.redirect("/edit");
+    }
+  });
 });
 
 port = process.env.PORT || 3000;

@@ -1,0 +1,18 @@
+<%- include('partials/header') %>
+
+<h1>Select an Image</h1>
+
+<form action="/new-panel" method="post">
+        <%images.forEach(function(image){%>
+      <input type="radio" id=<%=image.imageId%> name="imageId" value=<%=image.imageId%>>
+  <label for=<%=image.imageId%>> <%=image.title%> </label><br>
+    <%});%>
+
+    <div class="form-group">
+      <input type="text" class="form-control" id="panelText" name="panelText" placeholder="Caption your Panel" required>
+    </div>
+    <input type="hidden" id="userId" name="userId" value=<%=userId%>>
+    <input type="submit" value="Create panel">
+</form>
+
+<%- include('partials/footer') %>
