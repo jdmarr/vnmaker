@@ -1,19 +1,53 @@
 <%- include('partials/header') %>
 
 <h1>Login Successful</h1>
-<a class="btn btn-light btn-lg" href="/logout" role="button">Log Out</a>
+<div class="">
+  <a class="btn btn-light btn-lg" href="/logout" role="button">Log Out</a>
 
-<a class="btn btn-dark btn-lg" href="/new-panel" role="button">Add Panel Before</a>
+  <a class="btn btn-dark btn-lg" href="/new-panel" role="button">Add Panel Before</a>
+</div>
 
-<h1>Upload Image</h1>
+<br>
 
-<form action="/upload" method="post" enctype="multipart/form-data">
-  <input type="file" accept="image/*" name="photo">
-  <div class="form-group">
-    <input type="text" class="form-control" id="imageTitle" name="imageTitle" placeholder="Give your image a title" required>
-  </div>
-  <input type="hidden" id="userId" name="userId" value=<%=userId%>>
-  <input type="submit" value="Upload">
-</form>
+<div class="" width="460" height="345">
+  <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-inner">
+      <%for (i = 0; i < panelsAndImages.length; i++) {%>
+        <%if (i == 0) {%>
+          <div class="carousel-item active">
+        <%} else {%>
+          <div class="carousel-item">
+        <%}%>
+        <img src="uploads/images/<%=panelsAndImages[i].imagePath%>" class="d-block w-100" alt="...">
+        <div class="carousel-caption d-none d-md-block">
+          <p><%=panelsAndImages[i].text%></p>
+        </div>
+        </div>
+      <%}%>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Next</span>
+        </button>
+      </div>
+    </div>
 
-<%- include('partials/footer') %>
+    <br>
+
+    <div class="">
+      <h1>Upload Image</h1>
+
+      <form action="/upload" method="post" enctype="multipart/form-data">
+        <input type="file" accept="image/*" name="photo">
+        <div class="form-group">
+          <input type="text" class="form-control" id="imageTitle" name="imageTitle" placeholder="Give your image a title" required>
+        </div>
+        <input type="hidden" id="userId" name="userId" value=<%=userId%>>
+        <input type="submit" value="Upload">
+      </form>
+    </div>
+
+    <%- include('partials/footer') %>

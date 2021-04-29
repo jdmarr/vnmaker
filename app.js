@@ -7,7 +7,7 @@ const passport = require("passport");
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const GitHubStrategy = require('passport-github2').Strategy;
 const multer = require('multer');
-const upload = multer({dest: __dirname + '/uploads/images'});
+const upload = multer({dest: __dirname + '/public/uploads/images'});
 
 const {User, Image, Panel} = require('./model/appModel.js');
 
@@ -70,7 +70,15 @@ app.get("/", function(req, res) {
 
 app.get("/edit", function(req, res) {
   if (req.isAuthenticated()) {
-    res.render("edit", {userId: req.session.passport.user});
+    const userId = req.session.passport.user;
+    Panel.getPanelsAndImagesByUserId(userId, function(err, panelsAndImages){
+      if(err){
+        console.log(err);
+      }
+      else{
+        res.render("edit", {userId: userId, panelsAndImages: panelsAndImages});
+      }
+    });
   } else {
     res.redirect("/");
   }

@@ -238,4 +238,21 @@ Panel.getPanelsByUserId = function (userId, result) {
             });
 };
 
+Panel.getPanelsAndImagesByUserId = function (userId, result) {
+  var innerJoinQuery = "SELECT Panels.text, Panels.prevId, Panels.nextId, Images.imagePath";
+  innerJoinQuery += " FROM Panels";
+  innerJoinQuery += " INNER JOIN Images ON Panels.imageId = Images.imageId";
+  innerJoinQuery += " WHERE Panels.userId = " + userId + " AND Images.userId = " + userId;
+  sql.query(innerJoinQuery, function (err, res) {
+          if(err) {
+              console.log("getPanelsAndImagesByUserId error: ", err);
+              result(err, null);
+          }
+          else{
+            const resJSON = JSON.parse(JSON.stringify(res));
+              result(null, resJSON);
+          }
+      });
+};
+
 module.exports= {User, Image, Panel};
