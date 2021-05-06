@@ -1,0 +1,18 @@
+<%- include('partials/header') %>
+
+<figure class="figure">
+  <img src="/uploads/images/<%=imagePath%>" class="figure-img img-fluid rounded" alt="...">
+  <figcaption class="figure-caption"><%=panelText%></figcaption>
+</figure>
+
+<div class="">
+
+  <form action="/panels/<%=panelId%>" method="post">
+    <div class="form-group">
+      <input type="text" class="form-control" id="newPanelText" name="newPanelText" placeholder="Modify the panel text" required>
+    </div>
+    <input type="submit" value="Upload">
+  </form>
+</div>
+
+<%- include('partials/footer') %>

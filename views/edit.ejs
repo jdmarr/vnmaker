@@ -18,7 +18,9 @@
         <%} else {%>
           <div class="carousel-item">
         <%}%>
-        <img src="uploads/images/<%=panelsAndImages[i].imagePath%>" class="d-block w-100" alt="...">
+        <a href="/panels/<%=panelsAndImages[i].panelId%>">
+          <img src="/uploads/images/<%=panelsAndImages[i].imagePath%>" class="d-block w-100" alt="...">
+        </a>
         <div class="carousel-caption d-none d-md-block">
           <p><%=panelsAndImages[i].text%></p>
         </div>
@@ -34,6 +36,8 @@
         </button>
       </div>
     </div>
+  </div>
+  </div>
 
     <br>
 
