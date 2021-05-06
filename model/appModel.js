@@ -297,6 +297,31 @@ Panel.createPanelAndUpdateLinks = function(newPanel, result) {
   });
 };
 
+Panel.createStartPanelAndUpdateLinks = function(startPanel, result) {
+  // TODO: Error handling
+  sql.query("Select * from Panels where prevId is NULL", function(err, res) {
+    if (err) {
+      console.log("getStartPanel error: ", err);
+      result(err, null);
+    } else {
+      const resJSON = JSON.parse(JSON.stringify(res));
+      if (resJSON.length <= 1) {
+        const nextPanelId = resJSON[0].panelId;
+        startPanel.nextId = nextPanelId;
+        Panel.createPanel(startPanel, function(err, startPanelId){
+          Panel.updatePanel(nextPanelId, "prevId", startPanelId, function(err, success){
+            result(null, startPanelId);
+          });
+        });
+      } else {
+        multPanelErr = "Found multiple panels with prevId == NULL";
+        console.log("createStartPanelAndUpdateLinks error: ", multPanelErr);
+        result(multPanelErr, null);
+      }
+    }
+  });
+};
+
 Panel.deletePanel = function(panelId, result) {
   sql.query("Delete from Panels where panelId = ? ", panelId, function(err, res) {
     if (err) {

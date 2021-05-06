@@ -278,7 +278,7 @@ app.get("/new-panel", function(req, res) {
 });
 
 app.post("/panels", function(req, res) {
-  console.log(req.body);
+  if(req.body.prevPanelId >= 0){
   Panel.createPanelAndUpdateLinks({
     userId: req.body.userId,
     imageId: req.body.imageId,
@@ -291,6 +291,19 @@ app.post("/panels", function(req, res) {
       res.redirect("/edit");
     }
   });
+} else {
+  Panel.createStartPanelAndUpdateLinks({
+    userId: req.body.userId,
+    imageId: req.body.imageId,
+    text: req.body.panelText,
+  }, function(err, insertId) {
+    if (err) {
+      console.log(err);
+    } else {
+      res.redirect("/edit");
+    }
+  });
+}
 });
 
 port = process.env.PORT || 3000;
