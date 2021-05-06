@@ -149,14 +149,6 @@ app.get('/auth/github/edit',
     res.redirect('/edit');
   });
 
-app.get('/panels', function(req, res) {
-  if (req.isAuthenticated()) {
-
-  } else {
-    res.redirect("/");
-  }
-});
-
 app.get('/panels/:panelId', function(req, res) {
   if (req.isAuthenticated()) {
     const panelId = req.params.panelId;
