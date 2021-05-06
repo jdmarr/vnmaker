@@ -277,15 +277,16 @@ Panel.createPanel = function(newPanel, result) {
 };
 
 Panel.createPanelAndUpdateLinks = function(newPanel, result) {
-  // TODO: Check which one is filled - prev or next
-  const nextPanelId = newPanel.nextId;
-  Panel.getPanelById(nextPanelId, function(err, nextPanel){
-    const prevPanelId = nextPanel.prevId;
-    newPanel.prevId = prevPanelId;
+  // TODO: Error handling
+  const prevPanelId = newPanel.prevId;
+  Panel.getPanelById(prevPanelId, function(err, prevPanel){
+    const nextPanelId = prevPanel.nextId;
+    newPanel.nextId = nextPanelId;
     Panel.createPanel(newPanel, function(err, newPanelId){
-      Panel.updatePanel(nextPanelId, "prevId", newPanelId, function(err, success){
-        if (prevPanelId){
-          Panel.updatePanel(prevPanelId, "nextId", newPanelId, function(err, success){
+      Panel.updatePanel(prevPanelId, "nextId", newPanelId, function(err, success){
+        // nextPanelId may be null, if we are adding a panel after the current final panel
+        if (nextPanelId){
+          Panel.updatePanel(nextPanelId, "prevId", newPanelId, function(err, success){
             result(null, newPanelId);
           });
         } else {

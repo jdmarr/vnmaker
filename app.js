@@ -269,7 +269,7 @@ app.get("/new-panel", function(req, res) {
       res.render("new-panel", {
         images: images,
         userId: req.session.passport.user,
-        nextPanelId: req.query.nextPanelId
+        prevPanelId: req.query.prevPanelId
       });
     });
   } else {
@@ -283,7 +283,7 @@ app.post("/panels", function(req, res) {
     userId: req.body.userId,
     imageId: req.body.imageId,
     text: req.body.panelText,
-    nextId: req.body.nextPanelId
+    prevId: req.body.prevPanelId
   }, function(err, insertId) {
     if (err) {
       console.log(err);
