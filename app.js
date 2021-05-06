@@ -96,6 +96,24 @@ app.get("/edit", function(req, res) {
   }
 });
 
+app.get("/panels", function(req, res) {
+  if (req.isAuthenticated()) {
+    const userId = req.session.passport.user;
+    Panel.getPanelsAndImagesByUserId(userId, function(err, panelsAndImages) {
+      if (err) {
+        console.log(err);
+      } else {
+        res.render("panels", {
+          userId: userId,
+          panelsAndImages: panelsAndImages
+        });
+      }
+    });
+  } else {
+    res.redirect("/");
+  }
+});
+
 app.get("/logout", function(req, res) {
   req.logout();
   res.redirect('/');
@@ -222,7 +240,8 @@ app.get("/new-panel", function(req, res) {
     Image.getImagesByUserId(req.session.passport.user, function(err, images) {
       res.render("new-panel", {
         images: images,
-        userId: req.session.passport.user
+        userId: req.session.passport.user,
+        nextPanelId: req.query.nextPanelId
       });
     });
   } else {
@@ -232,10 +251,11 @@ app.get("/new-panel", function(req, res) {
 
 app.post("/panels", function(req, res) {
   console.log(req.body);
-  Panel.createPanel({
+  Panel.createPanelAndUpdateLinks({
     userId: req.body.userId,
     imageId: req.body.imageId,
-    text: req.body.panelText
+    text: req.body.panelText,
+    nextId: req.body.nextPanelId
   }, function(err, insertId) {
     if (err) {
       console.log(err);

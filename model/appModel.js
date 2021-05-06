@@ -216,18 +216,6 @@ var Panel = function(panel) {
   this.nextId = panel.nextId;
 };
 
-Panel.createPanel = function(newPanel, result) {
-  sql.query("INSERT INTO Panels set ?", newPanel, function(err, res) {
-    if (err) {
-      console.log("createPanel error: ", err);
-      result(err, null);
-    } else {
-      console.log("created new panel with panelId = ", res.insertId);
-      result(null, res.insertId);
-    }
-  });
-};
-
 Panel.getPanelById = function(panelId, result) {
   sql.query("Select * from Panels where panelId = ? ", panelId, function(err, res) {
     if (err) {
@@ -246,6 +234,21 @@ Panel.getPanelById = function(panelId, result) {
   });
 };
 
+Panel.updatePanel = function(panelId, field, newFieldData, result) {
+  var updateQuery = "UPDATE Panels";
+  updateQuery += " SET " + field + " = " + newFieldData;
+  updateQuery += " WHERE panelId = " + panelId;
+  sql.query(updateQuery, function(err, res) {
+    if (err) {
+      console.log("updatePanel error: ", err);
+      result(err, null);
+    } else {
+      console.log("updated panel with panelId = ", panelId);
+      result(null, true);
+    }
+  });
+};
+
 Panel.updatePanelText = function(panelId, newPanelText, result) {
   var updateTextQuery = "UPDATE Panels";
   updateTextQuery += " SET text = '" + newPanelText +"'";
@@ -258,6 +261,38 @@ Panel.updatePanelText = function(panelId, newPanelText, result) {
       console.log("updated panel with panelId = ", panelId);
       result(null, true);
     }
+  });
+};
+
+Panel.createPanel = function(newPanel, result) {
+  sql.query("INSERT INTO Panels set ?", newPanel, function(err, res) {
+    if (err) {
+      console.log("createPanel error: ", err);
+      result(err, null);
+    } else {
+      console.log("created new panel with panelId = ", res.insertId);
+      result(null, res.insertId);
+    }
+  });
+};
+
+Panel.createPanelAndUpdateLinks = function(newPanel, result) {
+  // TODO: Check which one is filled - prev or next
+  const nextPanelId = newPanel.nextId;
+  Panel.getPanelById(nextPanelId, function(err, nextPanel){
+    const prevPanelId = nextPanel.prevId;
+    newPanel.prevId = prevPanelId;
+    Panel.createPanel(newPanel, function(err, newPanelId){
+      Panel.updatePanel(nextPanelId, "prevId", newPanelId, function(err, success){
+        if (prevPanelId){
+          Panel.updatePanel(prevPanelId, "nextId", newPanelId, function(err, success){
+            result(null, newPanelId);
+          });
+        } else {
+          result(null, newPanelId);
+        }
+      });
+    });
   });
 };
 
