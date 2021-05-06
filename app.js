@@ -231,7 +231,7 @@ app.post('/panels/:panelId', function(req, res) {
       }
     });
   } else {
-    Panel.deletePanel(req.params.panelId, function(err, success) {
+    Panel.deletePanelAndUpdateLinks(req.params.panelId, function(err, success) {
       if (err) {
         console.log(err);
       } else {

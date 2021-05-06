@@ -251,7 +251,7 @@ Panel.updatePanel = function(panelId, field, newFieldData, result) {
 
 Panel.updatePanelText = function(panelId, newPanelText, result) {
   var updateTextQuery = "UPDATE Panels";
-  updateTextQuery += " SET text = '" + newPanelText +"'";
+  updateTextQuery += " SET text = '" + newPanelText + "'";
   updateTextQuery += " WHERE panelId = " + panelId;
   sql.query(updateTextQuery, function(err, res) {
     if (err) {
@@ -279,14 +279,14 @@ Panel.createPanel = function(newPanel, result) {
 Panel.createPanelAndUpdateLinks = function(newPanel, result) {
   // TODO: Error handling
   const prevPanelId = newPanel.prevId;
-  Panel.getPanelById(prevPanelId, function(err, prevPanel){
+  Panel.getPanelById(prevPanelId, function(err, prevPanel) {
     const nextPanelId = prevPanel.nextId;
     newPanel.nextId = nextPanelId;
-    Panel.createPanel(newPanel, function(err, newPanelId){
-      Panel.updatePanel(prevPanelId, "nextId", newPanelId, function(err, success){
+    Panel.createPanel(newPanel, function(err, newPanelId) {
+      Panel.updatePanel(prevPanelId, "nextId", newPanelId, function(err, success) {
         // nextPanelId may be null, if we are adding a panel after the current final panel
-        if (nextPanelId){
-          Panel.updatePanel(nextPanelId, "prevId", newPanelId, function(err, success){
+        if (nextPanelId) {
+          Panel.updatePanel(nextPanelId, "prevId", newPanelId, function(err, success) {
             result(null, newPanelId);
           });
         } else {
@@ -308,8 +308,8 @@ Panel.createStartPanelAndUpdateLinks = function(startPanel, result) {
       if (resJSON.length <= 1) {
         const nextPanelId = resJSON[0].panelId;
         startPanel.nextId = nextPanelId;
-        Panel.createPanel(startPanel, function(err, startPanelId){
-          Panel.updatePanel(nextPanelId, "prevId", startPanelId, function(err, success){
+        Panel.createPanel(startPanel, function(err, startPanelId) {
+          Panel.updatePanel(nextPanelId, "prevId", startPanelId, function(err, success) {
             result(null, startPanelId);
           });
         });
@@ -330,6 +330,36 @@ Panel.deletePanel = function(panelId, result) {
     } else {
       console.log("deleted panel with panelId = ", panelId);
       result(null, true);
+    }
+  });
+};
+
+Panel.deletePanelAndUpdateLinks = function(panelId, result) {
+  Panel.getPanelById(panelId, function(err, panel) {
+    if (!(panel.prevId === null)) {
+      Panel.updatePanel(panel.prevId, "nextId", panel.nextId, function(err, success) {
+        if (!(panel.nextId === null)) {
+          Panel.updatePanel(panel.nextId, "prevId", panel.prevId, function(err, success) {
+            Panel.deletePanel(panelId, function(err, success) {
+              result(null, success);
+            });
+          });
+        } else {
+          Panel.deletePanel(panelId, function(err, success) {
+            result(null, success);
+          });
+        }
+      });
+    } else if (!(panel.nextId === null)) {
+      Panel.updatePanel(panel.nextId, "prevId", panel.prevId, function(err, success) {
+        Panel.deletePanel(panelId, function(err, success) {
+          result(null, success);
+        });
+      });
+    } else {
+      Panel.deletePanel(panelId, function(err, success) {
+        result(null, success);
+      });
     }
   });
 };
