@@ -85,9 +85,27 @@ app.get("/edit", function(req, res) {
       if (err) {
         console.log(err);
       } else {
+
+        var panelMap = new Map();
+        var firstPanel = panelsAndImages[0];
+        panelsAndImages.forEach(function(panelAndImage){
+          panelMap.set(panelAndImage.panelId, panelAndImage);
+          if(panelAndImage.prevId === null){
+            firstPanel = panelAndImage;
+          }
+        });
+
+        var panelsAndImagesSorted = [firstPanel];
+        var nextPanelId = firstPanel.nextId;
+        while(!(nextPanelId === null)){
+          const nextPanel = panelMap.get(nextPanelId);
+          panelsAndImagesSorted.push(nextPanel);
+          nextPanelId = nextPanel.nextId;
+        }
+
         res.render("edit", {
           userId: userId,
-          panelsAndImages: panelsAndImages
+          panelsAndImages: panelsAndImagesSorted
         });
       }
     });
@@ -103,9 +121,27 @@ app.get("/panels", function(req, res) {
       if (err) {
         console.log(err);
       } else {
+
+        var panelMap = new Map();
+        var firstPanel = panelsAndImages[0];
+        panelsAndImages.forEach(function(panelAndImage){
+          panelMap.set(panelAndImage.panelId, panelAndImage);
+          if(panelAndImage.prevId === null){
+            firstPanel = panelAndImage;
+          }
+        });
+
+        var panelsAndImagesSorted = [firstPanel];
+        var nextPanelId = firstPanel.nextId;
+        while(!(nextPanelId === null)){
+          const nextPanel = panelMap.get(nextPanelId);
+          panelsAndImagesSorted.push(nextPanel);
+          nextPanelId = nextPanel.nextId;
+        }
+
         res.render("panels", {
           userId: userId,
-          panelsAndImages: panelsAndImages
+          panelsAndImages: panelsAndImagesSorted
         });
       }
     });
