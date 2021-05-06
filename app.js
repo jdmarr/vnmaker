@@ -187,7 +187,7 @@ app.post('/panels/:panelId', function(req, res) {
   }
 });
 
-app.post('/upload', upload.single('photo'), function(req, res) {
+app.post('/images', upload.single('photo'), function(req, res) {
   // TODO: Check autheticated
   if (req.file) {
     // TODO: Check image is valid
@@ -219,7 +219,7 @@ app.get("/new-panel", function(req, res) {
   }
 });
 
-app.post("/new-panel", function(req, res) {
+app.post("/panels", function(req, res) {
   console.log(req.body);
   Panel.createPanel({
     userId: req.body.userId,

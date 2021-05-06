@@ -2,7 +2,7 @@
 
 <h1>Select an Image</h1>
 
-<form action="/new-panel" method="post">
+<form action="/panels" method="post">
         <%images.forEach(function(image){%>
       <input type="radio" id=<%=image.imageId%> name="imageId" value=<%=image.imageId%>>
   <label for=<%=image.imageId%>> <%=image.title%> </label><br>
