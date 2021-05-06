@@ -175,6 +175,8 @@ app.get('/panels/:panelId', function(req, res) {
 
 app.post('/panels/:panelId', function(req, res) {
   if (req.isAuthenticated()) {
+    console.log(req.body._method);
+    if(req.body._method == 'patch'){
     Panel.updatePanelText(req.params.panelId, req.body.newPanelText, function(err, success) {
       if (err) {
         console.log(err);
@@ -182,6 +184,15 @@ app.post('/panels/:panelId', function(req, res) {
         res.redirect("/panels/" + req.params.panelId);
       }
     });
+  } else {
+    Panel.deletePanel(req.params.panelId, function(err, success) {
+      if (err) {
+        console.log(err);
+      } else {
+        res.redirect("/edit");
+      }
+    });
+    }
   } else {
     res.redirect("/");
   }

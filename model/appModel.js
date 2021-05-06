@@ -261,6 +261,18 @@ Panel.updatePanelText = function(panelId, newPanelText, result) {
   });
 };
 
+Panel.deletePanel = function(panelId, result) {
+  sql.query("Delete from Panels where panelId = ? ", panelId, function(err, res) {
+    if (err) {
+      console.log("deletePanel error: ", err);
+      result(err, null);
+    } else {
+      console.log("deleted panel with panelId = ", panelId);
+      result(null, true);
+    }
+  });
+};
+
 Panel.getPanelsByUserId = function(userId, result) {
   sql.query("Select * from Panels where userId = ? ", userId, function(err, res) {
     if (err) {

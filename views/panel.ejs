@@ -11,8 +11,16 @@
     <div class="form-group">
       <input type="text" class="form-control" id="newPanelText" name="newPanelText" placeholder="Modify the panel text" required>
     </div>
-    <input type="submit" value="Upload">
+    <input type="hidden" name="_method" value="patch"/>
+    <input type="submit" value="Modify">
   </form>
 </div>
+
+<br>
+
+<form action='/panels/<%=panelId%>' method="post">
+  <input type="hidden" name="_method" value="delete"/>
+  <input type="submit" value="Delete the panel">
+</form>
 
 <%- include('partials/footer') %>
