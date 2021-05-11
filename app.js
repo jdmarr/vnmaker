@@ -75,7 +75,7 @@ passport.use(new GitHubStrategy({
 ));
 
 app.get("/", function(req, res) {
-  res.render("home");
+  res.render("login");
 });
 
 app.get("/edit", function(req, res) {
