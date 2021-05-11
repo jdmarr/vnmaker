@@ -85,7 +85,7 @@ app.get("/edit", function(req, res) {
       if (err) {
         console.log(err);
       } else {
-
+      if(panelsAndImages.length > 0){
         var panelMap = new Map();
         var firstPanel = panelsAndImages[0];
         panelsAndImages.forEach(function(panelAndImage){
@@ -102,6 +102,9 @@ app.get("/edit", function(req, res) {
           panelsAndImagesSorted.push(nextPanel);
           nextPanelId = nextPanel.nextId;
         }
+      } else {
+        panelsAndImagesSorted = [];
+      }
 
         res.render("edit", {
           panelsAndImages: panelsAndImagesSorted
@@ -120,7 +123,7 @@ app.get("/panels", function(req, res) {
       if (err) {
         console.log(err);
       } else {
-
+      if(panelsAndImages.length > 0){
         var panelMap = new Map();
         var firstPanel = panelsAndImages[0];
         panelsAndImages.forEach(function(panelAndImage){
@@ -137,9 +140,11 @@ app.get("/panels", function(req, res) {
           panelsAndImagesSorted.push(nextPanel);
           nextPanelId = nextPanel.nextId;
         }
+      } else {
+        panelsAndImagesSorted = [];
+      }
 
         res.render("panels", {
-          userId: userId,
           panelsAndImages: panelsAndImagesSorted
         });
       }

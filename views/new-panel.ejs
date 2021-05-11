@@ -1,6 +1,8 @@
 <%- include('partials/header') %>
 <%- include('partials/navbar', {route: 'new-panel'}) %>
 
+<% if(images.length > 0){ %>
+
 <h1>Select an Image</h1>
 
 <form action="/panels" method="post">
@@ -16,5 +18,10 @@
     <input type="hidden" id="prevPanelId" name="prevPanelId" value=<%=prevPanelId%>>
     <input type="submit" value="Create panel">
 </form>
+
+<% } else { %>
+<h1>Please upload an image before adding a start panel</h1>
+<a class="btn btn-lg grey-background white" href="/edit" role="button">Return Home</a>
+<% } %>
 
 <%- include('partials/footer') %>
