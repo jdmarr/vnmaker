@@ -104,7 +104,6 @@ app.get("/edit", function(req, res) {
         }
 
         res.render("edit", {
-          userId: userId,
           panelsAndImages: panelsAndImagesSorted
         });
       }
@@ -261,6 +260,16 @@ app.post('/images', upload.single('photo'), function(req, res) {
       }
     });
   } else throw 'error';
+});
+
+app.get("/new-image", function(req, res) {
+  if (req.isAuthenticated()) {
+    res.render("new-image", {
+      userId: req.session.passport.user
+    });
+  } else {
+    res.redirect("/");
+  }
 });
 
 app.get("/new-panel", function(req, res) {

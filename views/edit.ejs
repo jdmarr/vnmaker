@@ -1,14 +1,11 @@
 <%- include('partials/header') %>
-
-<div class="">
-  <a class="btn btn-light btn-lg" href="/logout" role="button">Log Out</a>
-
-  <a class="btn btn-lg red-background white" href="/panels" role="button">Read</a>
-</div>
+<%- include('partials/navbar') %>
 
 <br>
 
-<a class="btn btn-lg white-background black" href="/new-panel?prevPanelId=-1" role="button">Add Start Panel</a>
+<a class="btn btn-lg red-background white" href="/new-panel?prevPanelId=-1" role="button">Add Start Panel</a>
+
+<a class="btn btn-lg blue-background white" href="/new-image" role="button">Add New Image</a>
 
 <br>
 
@@ -44,20 +41,5 @@
     </div>
   </div>
   </div>
-
-    <br>
-
-    <div class="">
-      <h1>Upload Image</h1>
-
-      <form action="/images" method="post" enctype="multipart/form-data">
-        <input type="file" accept="image/*" name="photo">
-        <div class="form-group">
-          <input type="text" class="form-control" id="imageTitle" name="imageTitle" placeholder="Give your image a title" required>
-        </div>
-        <input type="hidden" id="userId" name="userId" value=<%=userId%>>
-        <input type="submit" value="Upload">
-      </form>
-    </div>
 
     <%- include('partials/footer') %>
