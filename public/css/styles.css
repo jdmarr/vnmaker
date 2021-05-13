@@ -5,14 +5,14 @@
 .white {color:#ffffff;}
 
 .carousel-inner {
-  width: 50%;
-  left: 25%;
-  height: 500px;
+  width: 98%;
+  left: 1%;
+  height: 1000px;
 }
 
 .my-carousel-image {
   object-fit: cover;
-  height: 500px;
+  height: 1000px;
 }
 
 .my-figure-image {
@@ -22,7 +22,7 @@
 
 .button-set {
   margin: 0 auto;
-  width: 50%;
+  width: 98%;
 }
 
 .my-form {
