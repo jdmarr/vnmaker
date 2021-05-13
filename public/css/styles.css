@@ -3,3 +3,13 @@
 .blue-background {background-color:#0000ff;}
 .grey-background {background-color:#888888;}
 .white {color:#ffffff;}
+
+.carousel-inner {
+  width: 50%;
+  left: 25%;
+}
+
+.button-set {
+  margin: 0 auto;
+  width: 50%;
+}

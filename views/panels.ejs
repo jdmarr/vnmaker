@@ -1,7 +1,6 @@
 <%- include('partials/header') %>
 <%- include('partials/navbar', {route: 'panels'}) %>
 
-<div class="" width="460" height="345">
   <div id="carouselExampleControls" class="carousel slide" data-bs-ride="false">
     <div class="carousel-inner">
       <%for (i = 0; i < panelsAndImages.length; i++) {%>
@@ -22,7 +21,6 @@
         </button>
       </div>
     </div>
-  </div>
   </div>
 
   <%- include('partials/footer') %>

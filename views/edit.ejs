@@ -2,14 +2,14 @@
 <%- include('partials/navbar', {route: 'edit'}) %>
 
 <br>
+<div class="button-set">
+  <a class="btn btn-lg red-background white" href="/new-panel?prevPanelId=-1" role="button">Add Start Panel</a>
 
-<a class="btn btn-lg red-background white" href="/new-panel?prevPanelId=-1" role="button">Add Start Panel</a>
-
-<a class="btn btn-lg blue-background white" href="/new-image" role="button">Add New Image</a>
+  <a class="btn btn-lg blue-background white" href="/new-image" role="button">Add New Image</a>
+</div>
 
 <br>
 
-<div class="" width="460" height="345">
   <div id="carouselExampleControls" class="carousel slide" data-bs-ride="false">
     <div class="carousel-inner">
       <%for (i = 0; i < panelsAndImages.length; i++) {%>
@@ -39,7 +39,6 @@
         </button>
       </div>
     </div>
-  </div>
   </div>
 
     <%- include('partials/footer') %>
