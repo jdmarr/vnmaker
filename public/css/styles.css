@@ -17,7 +17,7 @@
 
 .my-figure-image {
   width: 5000px; /* stretch to fit whole container */
-  object-fit: cover;
+  object-fit: cover; /* smartly scale image for conatiner */
 }
 
 .button-set {
