@@ -1,12 +1,12 @@
 <%- include('partials/header') %>
 <%- include('partials/navbar', {route: 'panel'}) %>
-
+<div class="my-form">
 <figure class="figure">
   <img src="/uploads/images/<%=imagePath%>" class="figure-img img-fluid rounded" alt="...">
   <figcaption class="figure-caption"><%=panelText%></figcaption>
 </figure>
 
-<div class="">
+
 
   <form action="/panels/<%=panelId%>" method="post">
     <div class="form-group">
@@ -15,7 +15,6 @@
     <input type="hidden" name="_method" value="patch"/>
     <input type="submit" value="Modify">
   </form>
-</div>
 
 <br>
 
@@ -23,5 +22,6 @@
   <input type="hidden" name="_method" value="delete"/>
   <input type="submit" value="Delete the panel">
 </form>
+</div>
 
 <%- include('partials/footer') %>

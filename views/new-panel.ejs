@@ -2,22 +2,23 @@
 <%- include('partials/navbar', {route: 'new-panel'}) %>
 
 <% if(images.length > 0){ %>
-
+  
+<div class="my-form">
 <h1>Select an Image</h1>
+  <form action="/panels" method="post">
+          <%images.forEach(function(image){%>
+        <input type="radio" id=<%=image.imageId%> name="imageId" value=<%=image.imageId%>>
+    <label for=<%=image.imageId%>> <%=image.title%> </label><br>
+      <%});%>
 
-<form action="/panels" method="post">
-        <%images.forEach(function(image){%>
-      <input type="radio" id=<%=image.imageId%> name="imageId" value=<%=image.imageId%>>
-  <label for=<%=image.imageId%>> <%=image.title%> </label><br>
-    <%});%>
-
-    <div class="form-group">
-      <input type="text" class="form-control" id="panelText" name="panelText" placeholder="Caption your Panel" required>
-    </div>
-    <input type="hidden" id="userId" name="userId" value=<%=userId%>>
-    <input type="hidden" id="prevPanelId" name="prevPanelId" value=<%=prevPanelId%>>
-    <input type="submit" value="Create panel">
-</form>
+      <div class="form-group">
+        <input type="text" class="form-control" id="panelText" name="panelText" placeholder="Caption your Panel" required>
+      </div>
+      <input type="hidden" id="userId" name="userId" value=<%=userId%>>
+      <input type="hidden" id="prevPanelId" name="prevPanelId" value=<%=prevPanelId%>>
+      <input type="submit" value="Create panel">
+  </form>
+</div>
 
 <% } else { %>
 <h1>Please upload an image before adding a start panel</h1>

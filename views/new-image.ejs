@@ -1,9 +1,8 @@
 <%- include('partials/header') %>
 <%- include('partials/navbar', {route: 'new-image'}) %>
 
-<div class="">
-  <h1>Upload Image</h1>
-
+<div class="my-form">
+<h1>Upload Image</h1>
   <form action="/images" method="post" enctype="multipart/form-data">
     <input type="file" accept="image/*" name="photo">
     <div class="form-group">
