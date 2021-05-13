@@ -7,6 +7,17 @@
 .carousel-inner {
   width: 50%;
   left: 25%;
+  height: 500px;
+}
+
+.my-carousel-image {
+  object-fit: cover;
+  height: 500px;
+}
+
+.my-figure-image {
+  width: 5000px; /* stretch to fit whole container */
+  object-fit: cover;
 }
 
 .button-set {
