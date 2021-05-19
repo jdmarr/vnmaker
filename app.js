@@ -9,8 +9,16 @@ const GitHubStrategy = require('passport-github2').Strategy;
 const multer = require('multer');
 const fs = require('fs');
 const cloudinary = require('cloudinary').v2;
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'vnmaker',
+  },
+});
 const upload = multer({
-  dest: __dirname
+  storage: storage
 });
 
 const {
@@ -244,21 +252,11 @@ app.post('/panels/:panelId', function(req, res) {
 app.post('/images', upload.single('photo'), function(req, res) {
   if (req.isAuthenticated()) {
     if (req.file) {
-      const path = req.file.filename;
-      cloudinary.uploader.upload(
-        path,
-        { public_id: req.body.imageTitle}, // directory and tags are optional
-        function(err, image) {
-          if (err) return res.send(err)
           console.log('file uploaded to Cloudinary')
-          // remove file from server
-          const fs = require('fs')
-          fs.unlinkSync(path)
-          // return image details
-          console.log(image.secure_url);
+          console.log(req.file.path);
           Image.createImage({
             userId: req.body.userId,
-            imagePath: image.secure_url,
+            imagePath: req.file.path,
             title: req.body.imageTitle
           }, function(err, insertId) {
             if (err) {
@@ -267,7 +265,6 @@ app.post('/images', upload.single('photo'), function(req, res) {
               res.redirect('/edit');
             }
           });
-        });
     } else {
       console.log("Failed to upload image.");
       console.log("Request body:");
