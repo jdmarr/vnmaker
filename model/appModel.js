@@ -268,12 +268,16 @@ Panel.createStartPanelAndUpdateLinks = function(startPanel, result) {
     } else {
       const resJSON = JSON.parse(JSON.stringify(res));
       if (resJSON.length <= 1) {
-        const nextPanelId = resJSON[0].panelId;
-        startPanel.nextId = nextPanelId;
+        if (resJSON.length > 0){
+          const nextPanelId = resJSON[0].panelId;
+          startPanel.nextId = nextPanelId;
+        }
         Panel.createPanel(startPanel, function(err, startPanelId) {
+          if(resJSON.length > 0){
           Panel.updatePanel(nextPanelId, "prevId", startPanelId, function(err, success) {
             result(null, startPanelId);
-          });
+          });}
+          result(null, startPanelId);
         });
       } else {
         multPanelErr = "Found multiple panels with prevId == NULL";
