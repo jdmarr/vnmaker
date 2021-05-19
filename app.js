@@ -264,7 +264,22 @@ app.post('/images', upload.single('photo'), function(req, res) {
           res.redirect('/edit');
         }
       });
-    } else throw 'error';
+    } else {
+      console.log("Failed to upload image.");
+      console.log("Request body:");
+      console.log(req.body);
+      console.log("File:");
+      console.log(req.file);
+      res.redirect("/upload-failure");
+    };
+  } else {
+    res.redirect("/");
+  }
+});
+
+app.get('/upload-failure', function(req, res){
+  if (req.isAuthenticated()) {
+    res.render("upload-failure");
   } else {
     res.redirect("/");
   }
