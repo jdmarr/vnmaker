@@ -269,15 +269,16 @@ Panel.createStartPanelAndUpdateLinks = function(startPanel, result) {
       const resJSON = JSON.parse(JSON.stringify(res));
       if (resJSON.length <= 1) {
         if (resJSON.length > 0){
-          const nextPanelId = resJSON[0].panelId;
-          startPanel.nextId = nextPanelId;
+          startPanel.nextId = resJSON[0].panelId;
         }
         Panel.createPanel(startPanel, function(err, startPanelId) {
           if(resJSON.length > 0){
-          Panel.updatePanel(nextPanelId, "prevId", startPanelId, function(err, success) {
+          Panel.updatePanel(resJSON[0].panelId, "prevId", startPanelId, function(err, success) {
             result(null, startPanelId);
-          });}
-          result(null, startPanelId);
+          });
+          } else {
+            result(null, startPanelId);
+          }
         });
       } else {
         multPanelErr = "Found multiple panels with prevId == NULL";
