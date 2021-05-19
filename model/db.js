@@ -9,8 +9,4 @@ var connection = mysql.createPool({
     database : process.env.MYSQL_DATABASE
 });
 
-connection.connect(function(err) {
-    if (err) throw err;
-});
-
 module.exports = connection;
