@@ -7,8 +7,10 @@ const passport = require("passport");
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const GitHubStrategy = require('passport-github2').Strategy;
 const multer = require('multer');
+const fs = require('fs');
+const cloudinary = require('cloudinary').v2;
 const upload = multer({
-  dest: __dirname + '/public/uploads/images'
+  dest: __dirname
 });
 
 const {
@@ -73,6 +75,12 @@ passport.use(new GitHubStrategy({
     });
   }
 ));
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_SECRET
+});
 
 app.get("/", function(req, res) {
   res.render("login");
@@ -236,17 +244,30 @@ app.post('/panels/:panelId', function(req, res) {
 app.post('/images', upload.single('photo'), function(req, res) {
   if (req.isAuthenticated()) {
     if (req.file) {
-      Image.createImage({
-        userId: req.body.userId,
-        imagePath: req.file.filename,
-        title: req.body.imageTitle
-      }, function(err, insertId) {
-        if (err) {
-          console.log(err);
-        } else {
-          res.redirect('/edit');
-        }
-      });
+      const path = req.file.filename;
+      cloudinary.uploader.upload(
+        path,
+        { public_id: req.body.imageTitle}, // directory and tags are optional
+        function(err, image) {
+          if (err) return res.send(err)
+          console.log('file uploaded to Cloudinary')
+          // remove file from server
+          const fs = require('fs')
+          fs.unlinkSync(path)
+          // return image details
+          console.log(image.secure_url);
+          Image.createImage({
+            userId: req.body.userId,
+            imagePath: image.secure_url,
+            title: req.body.imageTitle
+          }, function(err, insertId) {
+            if (err) {
+              console.log(err);
+            } else {
+              res.redirect('/edit');
+            }
+          });
+        });
     } else {
       console.log("Failed to upload image.");
       console.log("Request body:");
