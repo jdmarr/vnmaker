@@ -85,26 +85,26 @@ app.get("/edit", function(req, res) {
       if (err) {
         console.log(err);
       } else {
-      if(panelsAndImages.length > 0){
-        var panelMap = new Map();
-        var firstPanel = panelsAndImages[0];
-        panelsAndImages.forEach(function(panelAndImage){
-          panelMap.set(panelAndImage.panelId, panelAndImage);
-          if(panelAndImage.prevId === null){
-            firstPanel = panelAndImage;
-          }
-        });
+        if (panelsAndImages.length > 0) {
+          var panelMap = new Map();
+          var firstPanel = panelsAndImages[0];
+          panelsAndImages.forEach(function(panelAndImage) {
+            panelMap.set(panelAndImage.panelId, panelAndImage);
+            if (panelAndImage.prevId === null) {
+              firstPanel = panelAndImage;
+            }
+          });
 
-        var panelsAndImagesSorted = [firstPanel];
-        var nextPanelId = firstPanel.nextId;
-        while(!(nextPanelId === null)){
-          const nextPanel = panelMap.get(nextPanelId);
-          panelsAndImagesSorted.push(nextPanel);
-          nextPanelId = nextPanel.nextId;
+          var panelsAndImagesSorted = [firstPanel];
+          var nextPanelId = firstPanel.nextId;
+          while (!(nextPanelId === null)) {
+            const nextPanel = panelMap.get(nextPanelId);
+            panelsAndImagesSorted.push(nextPanel);
+            nextPanelId = nextPanel.nextId;
+          }
+        } else {
+          panelsAndImagesSorted = [];
         }
-      } else {
-        panelsAndImagesSorted = [];
-      }
 
         res.render("edit", {
           panelsAndImages: panelsAndImagesSorted
@@ -123,26 +123,26 @@ app.get("/panels", function(req, res) {
       if (err) {
         console.log(err);
       } else {
-      if(panelsAndImages.length > 0){
-        var panelMap = new Map();
-        var firstPanel = panelsAndImages[0];
-        panelsAndImages.forEach(function(panelAndImage){
-          panelMap.set(panelAndImage.panelId, panelAndImage);
-          if(panelAndImage.prevId === null){
-            firstPanel = panelAndImage;
-          }
-        });
+        if (panelsAndImages.length > 0) {
+          var panelMap = new Map();
+          var firstPanel = panelsAndImages[0];
+          panelsAndImages.forEach(function(panelAndImage) {
+            panelMap.set(panelAndImage.panelId, panelAndImage);
+            if (panelAndImage.prevId === null) {
+              firstPanel = panelAndImage;
+            }
+          });
 
-        var panelsAndImagesSorted = [firstPanel];
-        var nextPanelId = firstPanel.nextId;
-        while(!(nextPanelId === null)){
-          const nextPanel = panelMap.get(nextPanelId);
-          panelsAndImagesSorted.push(nextPanel);
-          nextPanelId = nextPanel.nextId;
+          var panelsAndImagesSorted = [firstPanel];
+          var nextPanelId = firstPanel.nextId;
+          while (!(nextPanelId === null)) {
+            const nextPanel = panelMap.get(nextPanelId);
+            panelsAndImagesSorted.push(nextPanel);
+            nextPanelId = nextPanel.nextId;
+          }
+        } else {
+          panelsAndImagesSorted = [];
         }
-      } else {
-        panelsAndImagesSorted = [];
-      }
 
         res.render("panels", {
           panelsAndImages: panelsAndImagesSorted
@@ -226,22 +226,22 @@ app.get('/panels/:panelId', function(req, res) {
 app.post('/panels/:panelId', function(req, res) {
   if (req.isAuthenticated()) {
     console.log(req.body._method);
-    if(req.body._method == 'patch'){
-    Panel.updatePanelText(req.params.panelId, req.body.newPanelText, function(err, success) {
-      if (err) {
-        console.log(err);
-      } else {
-        res.redirect("/panels/" + req.params.panelId);
-      }
-    });
-  } else {
-    Panel.deletePanelAndUpdateLinks(req.params.panelId, function(err, success) {
-      if (err) {
-        console.log(err);
-      } else {
-        res.redirect("/edit");
-      }
-    });
+    if (req.body._method == 'patch') {
+      Panel.updatePanelText(req.params.panelId, req.body.newPanelText, function(err, success) {
+        if (err) {
+          console.log(err);
+        } else {
+          res.redirect("/panels/" + req.params.panelId);
+        }
+      });
+    } else {
+      Panel.deletePanelAndUpdateLinks(req.params.panelId, function(err, success) {
+        if (err) {
+          console.log(err);
+        } else {
+          res.redirect("/edit");
+        }
+      });
     }
   } else {
     res.redirect("/");
@@ -249,22 +249,25 @@ app.post('/panels/:panelId', function(req, res) {
 });
 
 app.post('/images', upload.single('photo'), function(req, res) {
-  // TODO: Check autheticated
-  if (req.file) {
-    // TODO: Check image is valid
-    // TODO: Check title isn't a duplicate
-    Image.createImage({
-      userId: req.body.userId,
-      imagePath: req.file.filename,
-      title: req.body.imageTitle
-    }, function(err, insertId) {
-      if (err) {
-        console.log(err);
-      } else {
-        res.redirect('/edit');
-      }
-    });
-  } else throw 'error';
+  if (req.isAuthenticated()) {
+    if (req.file) {
+      // TODO: Check image is valid
+      // TODO: Check title isn't a duplicate
+      Image.createImage({
+        userId: req.body.userId,
+        imagePath: req.file.filename,
+        title: req.body.imageTitle
+      }, function(err, insertId) {
+        if (err) {
+          console.log(err);
+        } else {
+          res.redirect('/edit');
+        }
+      });
+    } else throw 'error';
+  } else {
+    res.redirect("/");
+  }
 });
 
 app.get("/new-image", function(req, res) {
@@ -292,32 +295,36 @@ app.get("/new-panel", function(req, res) {
 });
 
 app.post("/panels", function(req, res) {
-  if(req.body.prevPanelId >= 0){
-  Panel.createPanelAndUpdateLinks({
-    userId: req.body.userId,
-    imageId: req.body.imageId,
-    text: req.body.panelText,
-    prevId: req.body.prevPanelId
-  }, function(err, insertId) {
-    if (err) {
-      console.log(err);
+  if (req.isAuthenticated()) {
+    if (req.body.prevPanelId >= 0) {
+      Panel.createPanelAndUpdateLinks({
+        userId: req.body.userId,
+        imageId: req.body.imageId,
+        text: req.body.panelText,
+        prevId: req.body.prevPanelId
+      }, function(err, insertId) {
+        if (err) {
+          console.log(err);
+        } else {
+          res.redirect("/edit");
+        }
+      });
     } else {
-      res.redirect("/edit");
+      Panel.createStartPanelAndUpdateLinks({
+        userId: req.body.userId,
+        imageId: req.body.imageId,
+        text: req.body.panelText,
+      }, function(err, insertId) {
+        if (err) {
+          console.log(err);
+        } else {
+          res.redirect("/edit");
+        }
+      });
     }
-  });
-} else {
-  Panel.createStartPanelAndUpdateLinks({
-    userId: req.body.userId,
-    imageId: req.body.imageId,
-    text: req.body.panelText,
-  }, function(err, insertId) {
-    if (err) {
-      console.log(err);
-    } else {
-      res.redirect("/edit");
-    }
-  });
-}
+  } else {
+    res.redirect("/");
+  }
 });
 
 port = process.env.PORT || 3000;
