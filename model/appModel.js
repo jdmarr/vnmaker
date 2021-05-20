@@ -9,7 +9,6 @@ var User = function(user) {
 };
 User.createUser = function(newUser, result) {
   sql.query("INSERT INTO Users set ?", newUser, function(err, res) {
-
     if (err) {
       console.log("createUser error: ", err);
       result(err, null);
@@ -19,47 +18,50 @@ User.createUser = function(newUser, result) {
     }
   });
 };
-User.getUserById = function(user, result) {
-  sql.query("Select * from Users where userId = ? ", user.userId, function(err, res) {
-    if (err) {
-      console.log("getUserById error: ", err);
-      result(err, null);
-    } else {
-      const resJSON = JSON.parse(JSON.stringify(res));
-      result(null, resJSON[0]);
-
-    }
-  });
-};
-User.getUserByThirdPartyId = function(user, thirdparty, result) {
-  var thirdPartyString;
+User.getUser = function(user, column, result) {
+  var columnString;
   var queryId;
-  if (thirdparty == 'google') {
-    thirdPartyString = 'googleId';
+  if (column == 'id') {
+    columnString = 'userId';
+    queryId = user.userId;
+  }
+  else if (column == 'google') {
+    columnString = 'googleId';
     queryId = user.googleId;
   } else {
-    thirdPartyString = 'githubId';
+    columnString = 'githubId';
     queryId = user.githubId;
   }
-  const queryString = "Select * from Users where " + thirdPartyString + " = ? ";
+  const queryString = "Select * from Users where " + columnString + " = ? ";
   sql.query(queryString, queryId, function(err, res) {
     if (err) {
-      console.log("getUserByThirdPartyId error: ", err);
+      console.log("getUser error: ", err);
       result(err, null);
     } else {
       const resJSON = JSON.parse(JSON.stringify(res));
       if (resJSON.length <= 1) {
         result(null, resJSON[0]);
       } else {
-        multUserErr = "Found multiple users with same " + thirdPartyString;
-        console.log("getUserByThirdPartyId error: ", multUserErr);
+        multUserErr = "Found multiple users with same " + columnString;
+        console.log("getUser error: ", multUserErr);
         result(multUserErr, null);
       }
     }
   });
 };
+
+User.getUserById = function(user, result) {
+  User.getUser(user, 'id', function(err, res){
+    if (err) {
+      result(err, null);
+    } else {
+      result(null, res);
+    }
+  });
+};
+
 User.findOrCreateByThirdPartyId = function(user, thirdparty, result) {
-  User.getUserByThirdPartyId(user, thirdparty, function(err, existingUser) {
+  User.getUser(user, thirdparty, function(err, existingUser) {
     if (err) {
       result(err, null);
     } else {
@@ -81,7 +83,7 @@ User.findOrCreateByThirdPartyId = function(user, thirdparty, result) {
   });
 };
 User.getUserByGoogleId = function(user, result) {
-  User.getUserByThirdPartyId(user, 'google', function(err, res) {
+  User.getUser(user, 'google', function(err, res) {
     if (err) {
       result(err, null);
     } else {
@@ -99,7 +101,7 @@ User.findOrCreateByGoogleId = function(user, result) {
   });
 };
 User.getUserByGitHubId = function(user, result) {
-  User.getUserByThirdPartyId(user, 'github', function(err, res) {
+  User.getUser(user, 'github', function(err, res) {
     if (err) {
       result(err, null);
     } else {
@@ -127,7 +129,6 @@ var Image = function(image) {
 
 Image.createImage = function(newImage, result) {
   sql.query("INSERT INTO Images set ?", newImage, function(err, res) {
-
     if (err) {
       console.log("createImage error: ", err);
       result(err, null);
@@ -212,15 +213,10 @@ Panel.updatePanel = function(panelId, field, newFieldData, result) {
 };
 
 Panel.updatePanelText = function(panelId, newPanelText, result) {
-  var updateTextQuery = "UPDATE Panels";
-  updateTextQuery += " SET text = '" + newPanelText + "'";
-  updateTextQuery += " WHERE panelId = " + panelId;
-  sql.query(updateTextQuery, function(err, res) {
+  Panel.updatePanel(panelId, 'text', newPanelText, function(err, res){
     if (err) {
-      console.log("updatePanelText error: ", err);
       result(err, null);
     } else {
-      console.log("updated panel with panelId = ", panelId);
       result(null, true);
     }
   });
@@ -239,30 +235,45 @@ Panel.createPanel = function(newPanel, result) {
 };
 
 Panel.createPanelAndUpdateLinks = function(newPanel, result) {
-  // TODO: Error handling
   const prevPanelId = newPanel.prevId;
   Panel.getPanelById(prevPanelId, function(err, prevPanel) {
-    const nextPanelId = prevPanel.nextId;
-    newPanel.nextId = nextPanelId;
-    Panel.createPanel(newPanel, function(err, newPanelId) {
-      Panel.updatePanel(prevPanelId, "nextId", newPanelId, function(err, success) {
-        // nextPanelId may be null, if we are adding a panel after the current final panel
-        if (nextPanelId) {
-          Panel.updatePanel(nextPanelId, "prevId", newPanelId, function(err, success) {
-            result(null, newPanelId);
-          });
+    if (err) {
+      result(err, null);
+    } else {
+      const nextPanelId = prevPanel.nextId;
+      newPanel.nextId = nextPanelId;
+      Panel.createPanel(newPanel, function(err, newPanelId) {
+        if (err){
+          result(err, null);
         } else {
-          result(null, newPanelId);
+          Panel.updatePanel(prevPanelId, "nextId", newPanelId, function(err, success) {
+            if(err){
+              result(err, null);
+            } else {
+              // nextPanelId may be null, if we are adding a panel after the current final panel
+              if (nextPanelId) {
+                Panel.updatePanel(nextPanelId, "prevId", newPanelId, function(err, success) {
+                  if (err){
+                    result(err, null);
+                  } else {
+                    result(null, newPanelId);
+                  }
+                });
+              } else {
+                result(null, newPanelId);
+              }
+            }
+          });
         }
       });
-    });
+    }
   });
 };
 
 Panel.createStartPanelAndUpdateLinks = function(startPanel, result) {
   sql.query("Select * from Panels where prevId is NULL AND userId = ? ", startPanel.userId, function(err, res) {
     if (err) {
-      console.log("getStartPanel error: ", err);
+      console.log("createStartPanelAndUpdateLinks error: ", err);
       result(err, null);
     } else {
       const resJSON = JSON.parse(JSON.stringify(res));
@@ -280,7 +291,7 @@ Panel.createStartPanelAndUpdateLinks = function(startPanel, result) {
           }
         });
       } else {
-        multPanelErr = "Found multiple panels with prevId == NULL";
+        multPanelErr = "Found multiple panels with userId = " + startPanel.userId + " AND prevId == NULL";
         console.log("createStartPanelAndUpdateLinks error: ", multPanelErr);
         result(multPanelErr, null);
       }
@@ -302,30 +313,62 @@ Panel.deletePanel = function(panelId, result) {
 
 Panel.deletePanelAndUpdateLinks = function(panelId, result) {
   Panel.getPanelById(panelId, function(err, panel) {
-    if (!(panel.prevId === null)) {
-      Panel.updatePanel(panel.prevId, "nextId", panel.nextId, function(err, success) {
-        if (!(panel.nextId === null)) {
-          Panel.updatePanel(panel.nextId, "prevId", panel.prevId, function(err, success) {
-            Panel.deletePanel(panelId, function(err, success) {
-              result(null, success);
-            });
-          });
-        } else {
-          Panel.deletePanel(panelId, function(err, success) {
-            result(null, success);
-          });
-        }
-      });
-    } else if (!(panel.nextId === null)) {
-      Panel.updatePanel(panel.nextId, "prevId", panel.prevId, function(err, success) {
-        Panel.deletePanel(panelId, function(err, success) {
-          result(null, success);
-        });
-      });
+    if(err){
+      result(err, null);
     } else {
-      Panel.deletePanel(panelId, function(err, success) {
-        result(null, success);
-      });
+      if (!(panel.prevId === null)) {
+        Panel.updatePanel(panel.prevId, "nextId", panel.nextId, function(err, success) {
+          if(err){
+            result(err, null);
+          } else {
+            if (!(panel.nextId === null)) {
+              Panel.updatePanel(panel.nextId, "prevId", panel.prevId, function(err, success) {
+                if(err){
+                  result(err, null);
+                } else {
+                  Panel.deletePanel(panelId, function(err, success) {
+                    if(err){
+                      result(err, null);
+                    } else {
+                      result(null, success);
+                    }
+                  });
+                }
+              });
+            } else {
+              Panel.deletePanel(panelId, function(err, success) {
+                if(err){
+                  result(err, null);
+                } else {
+                  result(null, success);
+                }
+              });
+            }
+          }
+        });
+      } else if (!(panel.nextId === null)) {
+        Panel.updatePanel(panel.nextId, "prevId", panel.prevId, function(err, success) {
+          if(err){
+            result(err, null);
+          } else {
+            Panel.deletePanel(panelId, function(err, success) {
+              if(err){
+                result(err, null);
+              } else {
+                result(null, success);
+              }
+            });
+          }
+        });
+      } else {
+        Panel.deletePanel(panelId, function(err, success) {
+          if(err){
+            result(err, null);
+          } else {
+            result(null, success);
+          }
+        });
+      }
     }
   });
 };
