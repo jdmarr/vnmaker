@@ -1,0 +1,28 @@
+CREATE TABLE Users (
+    userId INT NOT NULL AUTO_INCREMENT,
+    username VARCHAR(255),
+    googleId VARCHAR(255),
+    githubId VARCHAR(255),
+    PRIMARY KEY (userId)
+);
+
+CREATE TABLE Images (
+    imageId INT NOT NULL AUTO_INCREMENT,
+    userId INT NOT NULL,
+    imagePath VARCHAR(255) NOT NULL,
+    title VARCHAR(1023) NOT NULL,
+    PRIMARY KEY (imageId),
+    FOREIGN KEY (userId) REFERENCES Users(userId)
+);
+
+CREATE TABLE Panels (
+    panelId INT NOT NULL AUTO_INCREMENT,
+    userId INT NOT NULL,
+    imageId INT NOT NULL,
+    text VARCHAR(4095),
+    prevId INT,
+    nextId INT,
+    PRIMARY KEY (panelId),
+    FOREIGN KEY (userId) REFERENCES Users(userId),
+    FOREIGN KEY (imageId) REFERENCES Images(imageId)
+);
