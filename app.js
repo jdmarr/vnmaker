@@ -78,6 +78,31 @@ app.get("/", function(req, res) {
   res.render("login");
 });
 
+function sortPanelsAndImages(panelsAndImages){
+  if (panelsAndImages.length > 0) {
+    var panelMap = new Map();
+    var firstPanel = panelsAndImages[0];
+    panelsAndImages.forEach(function(panelAndImage) {
+      panelMap.set(panelAndImage.panelId, panelAndImage);
+      if (panelAndImage.prevId === null) {
+        firstPanel = panelAndImage;
+      }
+    });
+
+    var panelsAndImagesSorted = [firstPanel];
+    var nextPanelId = firstPanel.nextId;
+    while (!(nextPanelId === null)) {
+      const nextPanel = panelMap.get(nextPanelId);
+      panelsAndImagesSorted.push(nextPanel);
+      nextPanelId = nextPanel.nextId;
+    }
+  } else {
+    panelsAndImagesSorted = [];
+  }
+
+  return panelsAndImagesSorted;
+};
+
 app.get("/edit", function(req, res) {
   if (req.isAuthenticated()) {
     const userId = req.session.passport.user;
@@ -85,27 +110,7 @@ app.get("/edit", function(req, res) {
       if (err) {
         console.log(err);
       } else {
-        if (panelsAndImages.length > 0) {
-          var panelMap = new Map();
-          var firstPanel = panelsAndImages[0];
-          panelsAndImages.forEach(function(panelAndImage) {
-            panelMap.set(panelAndImage.panelId, panelAndImage);
-            if (panelAndImage.prevId === null) {
-              firstPanel = panelAndImage;
-            }
-          });
-
-          var panelsAndImagesSorted = [firstPanel];
-          var nextPanelId = firstPanel.nextId;
-          while (!(nextPanelId === null)) {
-            const nextPanel = panelMap.get(nextPanelId);
-            panelsAndImagesSorted.push(nextPanel);
-            nextPanelId = nextPanel.nextId;
-          }
-        } else {
-          panelsAndImagesSorted = [];
-        }
-
+        const panelsAndImagesSorted = sortPanelsAndImages(panelsAndImages);
         res.render("edit", {
           panelsAndImages: panelsAndImagesSorted
         });
@@ -123,27 +128,7 @@ app.get("/panels", function(req, res) {
       if (err) {
         console.log(err);
       } else {
-        if (panelsAndImages.length > 0) {
-          var panelMap = new Map();
-          var firstPanel = panelsAndImages[0];
-          panelsAndImages.forEach(function(panelAndImage) {
-            panelMap.set(panelAndImage.panelId, panelAndImage);
-            if (panelAndImage.prevId === null) {
-              firstPanel = panelAndImage;
-            }
-          });
-
-          var panelsAndImagesSorted = [firstPanel];
-          var nextPanelId = firstPanel.nextId;
-          while (!(nextPanelId === null)) {
-            const nextPanel = panelMap.get(nextPanelId);
-            panelsAndImagesSorted.push(nextPanel);
-            nextPanelId = nextPanel.nextId;
-          }
-        } else {
-          panelsAndImagesSorted = [];
-        }
-
+        const panelsAndImagesSorted = sortPanelsAndImages(panelsAndImages);
         res.render("panels", {
           panelsAndImages: panelsAndImagesSorted
         });
@@ -251,8 +236,6 @@ app.post('/panels/:panelId', function(req, res) {
 app.post('/images', upload.single('photo'), function(req, res) {
   if (req.isAuthenticated()) {
     if (req.file) {
-      // TODO: Check image is valid
-      // TODO: Check title isn't a duplicate
       Image.createImage({
         userId: req.body.userId,
         imagePath: req.file.filename,
