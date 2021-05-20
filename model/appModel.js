@@ -260,8 +260,7 @@ Panel.createPanelAndUpdateLinks = function(newPanel, result) {
 };
 
 Panel.createStartPanelAndUpdateLinks = function(startPanel, result) {
-  // TODO: Error handling
-  sql.query("Select * from Panels where prevId is NULL", function(err, res) {
+  sql.query("Select * from Panels where prevId is NULL AND userId = ? ", startPanel.userId, function(err, res) {
     if (err) {
       console.log("getStartPanel error: ", err);
       result(err, null);
