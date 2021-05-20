@@ -218,7 +218,8 @@ Panel.updatePanel = function(panelId, field, newFieldData, result) {
 };
 
 Panel.updatePanelText = function(panelId, newPanelText, result) {
-  Panel.updatePanel(panelId, 'text', newPanelText, function(err, res) {
+  const newPanelTextFormattedForSQL = "'" + newPanelText + "'";
+  Panel.updatePanel(panelId, 'text', newPanelTextFormattedForSQL, function(err, res) {
     if (err) {
       result(err, null);
     } else {

@@ -210,7 +210,7 @@ app.get('/panels/:panelId', function(req, res) {
 
 app.post('/panels/:panelId', function(req, res) {
   if (req.isAuthenticated()) {
-    console.log(req.body._method);
+    console.log(req.body._method + " panel " + req.params.panelId + ":");
     if (req.body._method == 'patch') {
       Panel.updatePanelText(req.params.panelId, req.body.newPanelText, function(err, success) {
         if (err) {
