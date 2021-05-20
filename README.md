@@ -22,3 +22,13 @@ cp dotenv-template .env
 npm install
 node app.js
 ```
+
+### CLOUD DEPLOYMENT WITH HEROKU
+
+Deployment in the cloud with Heroku is achieved using ClearDB for cloud MySQL database
+```md
+heroku addons:create cleardb:ignite
+```
+
+and Cloudinary for cloud image storage.
+  - https://cloudinary.com
