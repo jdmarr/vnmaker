@@ -1,6 +1,10 @@
+# VNMAKER
+
 VNMaker is a web app for creating slide shows and visual novels.
 
 It is currently deployed at https://jdmarr-vnmaker.herokuapp.com/
+
+### LOCAL DEPLOYMENT
 
 For local deployment, follow these steps:
 
