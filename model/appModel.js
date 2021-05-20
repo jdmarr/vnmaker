@@ -7,6 +7,7 @@ var User = function(user) {
   this.googleId = user.googleId;
   this.githubId = user.githubId;
 };
+
 User.createUser = function(newUser, result) {
   sql.query("INSERT INTO Users set ?", newUser, function(err, res) {
     if (err) {
@@ -18,14 +19,14 @@ User.createUser = function(newUser, result) {
     }
   });
 };
+
 User.getUser = function(user, column, result) {
   var columnString;
   var queryId;
   if (column == 'id') {
     columnString = 'userId';
     queryId = user.userId;
-  }
-  else if (column == 'google') {
+  } else if (column == 'google') {
     columnString = 'googleId';
     queryId = user.googleId;
   } else {
@@ -51,7 +52,7 @@ User.getUser = function(user, column, result) {
 };
 
 User.getUserById = function(user, result) {
-  User.getUser(user, 'id', function(err, res){
+  User.getUser(user, 'id', function(err, res) {
     if (err) {
       result(err, null);
     } else {
@@ -82,6 +83,7 @@ User.findOrCreateByThirdPartyId = function(user, thirdparty, result) {
     }
   });
 };
+
 User.getUserByGoogleId = function(user, result) {
   User.getUser(user, 'google', function(err, res) {
     if (err) {
@@ -91,6 +93,7 @@ User.getUserByGoogleId = function(user, result) {
     }
   });
 };
+
 User.findOrCreateByGoogleId = function(user, result) {
   User.findOrCreateByThirdPartyId(user, 'google', function(err, newOrExistingUser) {
     if (err) {
@@ -100,6 +103,7 @@ User.findOrCreateByGoogleId = function(user, result) {
     }
   });
 };
+
 User.getUserByGitHubId = function(user, result) {
   User.getUser(user, 'github', function(err, res) {
     if (err) {
@@ -109,6 +113,7 @@ User.getUserByGitHubId = function(user, result) {
     }
   });
 };
+
 User.findOrCreateByGitHubId = function(user, result) {
   User.findOrCreateByThirdPartyId(user, 'github', function(err, newOrExistingUser) {
     if (err) {
@@ -213,7 +218,7 @@ Panel.updatePanel = function(panelId, field, newFieldData, result) {
 };
 
 Panel.updatePanelText = function(panelId, newPanelText, result) {
-  Panel.updatePanel(panelId, 'text', newPanelText, function(err, res){
+  Panel.updatePanel(panelId, 'text', newPanelText, function(err, res) {
     if (err) {
       result(err, null);
     } else {
@@ -243,17 +248,17 @@ Panel.createPanelAndUpdateLinks = function(newPanel, result) {
       const nextPanelId = prevPanel.nextId;
       newPanel.nextId = nextPanelId;
       Panel.createPanel(newPanel, function(err, newPanelId) {
-        if (err){
+        if (err) {
           result(err, null);
         } else {
           Panel.updatePanel(prevPanelId, "nextId", newPanelId, function(err, success) {
-            if(err){
+            if (err) {
               result(err, null);
             } else {
               // nextPanelId may be null, if we are adding a panel after the current final panel
               if (nextPanelId) {
                 Panel.updatePanel(nextPanelId, "prevId", newPanelId, function(err, success) {
-                  if (err){
+                  if (err) {
                     result(err, null);
                   } else {
                     result(null, newPanelId);
@@ -278,14 +283,14 @@ Panel.createStartPanelAndUpdateLinks = function(startPanel, result) {
     } else {
       const resJSON = JSON.parse(JSON.stringify(res));
       if (resJSON.length <= 1) {
-        if (resJSON.length > 0){
+        if (resJSON.length > 0) {
           startPanel.nextId = resJSON[0].panelId;
         }
         Panel.createPanel(startPanel, function(err, startPanelId) {
-          if(resJSON.length > 0){
-          Panel.updatePanel(resJSON[0].panelId, "prevId", startPanelId, function(err, success) {
-            result(null, startPanelId);
-          });
+          if (resJSON.length > 0) {
+            Panel.updatePanel(resJSON[0].panelId, "prevId", startPanelId, function(err, success) {
+              result(null, startPanelId);
+            });
           } else {
             result(null, startPanelId);
           }
@@ -313,21 +318,21 @@ Panel.deletePanel = function(panelId, result) {
 
 Panel.deletePanelAndUpdateLinks = function(panelId, result) {
   Panel.getPanelById(panelId, function(err, panel) {
-    if(err){
+    if (err) {
       result(err, null);
     } else {
       if (!(panel.prevId === null)) {
         Panel.updatePanel(panel.prevId, "nextId", panel.nextId, function(err, success) {
-          if(err){
+          if (err) {
             result(err, null);
           } else {
             if (!(panel.nextId === null)) {
               Panel.updatePanel(panel.nextId, "prevId", panel.prevId, function(err, success) {
-                if(err){
+                if (err) {
                   result(err, null);
                 } else {
                   Panel.deletePanel(panelId, function(err, success) {
-                    if(err){
+                    if (err) {
                       result(err, null);
                     } else {
                       result(null, success);
@@ -337,7 +342,7 @@ Panel.deletePanelAndUpdateLinks = function(panelId, result) {
               });
             } else {
               Panel.deletePanel(panelId, function(err, success) {
-                if(err){
+                if (err) {
                   result(err, null);
                 } else {
                   result(null, success);
@@ -348,11 +353,11 @@ Panel.deletePanelAndUpdateLinks = function(panelId, result) {
         });
       } else if (!(panel.nextId === null)) {
         Panel.updatePanel(panel.nextId, "prevId", panel.prevId, function(err, success) {
-          if(err){
+          if (err) {
             result(err, null);
           } else {
             Panel.deletePanel(panelId, function(err, success) {
-              if(err){
+              if (err) {
                 result(err, null);
               } else {
                 result(null, success);
@@ -362,7 +367,7 @@ Panel.deletePanelAndUpdateLinks = function(panelId, result) {
         });
       } else {
         Panel.deletePanel(panelId, function(err, success) {
-          if(err){
+          if (err) {
             result(err, null);
           } else {
             result(null, success);
